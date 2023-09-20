@@ -10,7 +10,7 @@ use isTerpz710\EasyWarps\Command\DeleteWarpCommand;
 use isTerpz710\EasyWarps\Command\WarpsCommand;
 use isTerpz710\EasyWarps\Command\WarpCommand;
 
-class EasyWarpsPlugin extends PluginBase {
+class Main extends PluginBase {
 
     public function onEnable(): void {
         
