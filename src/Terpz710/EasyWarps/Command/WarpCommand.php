@@ -7,81 +7,63 @@ namespace Terpz710\EasyWarps\Command;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
-use pocketmine\plugin\Plugin;
-use pocketmine\utils\TextFormat;
 use pocketmine\utils\Config;
+use pocketmine\math\Vector3;
 use Terpz710\EasyWarps\Main;
 
 class WarpCommand extends Command {
 
-    private $plugin;
+    private $dataFolder;
 
-    public function __construct(Plugin $plugin) {
-        parent::__construct("warp", "Warp to a specified location", "/warp <warpName>");
-        $this->plugin = $plugin;
-        $this->setPermission("easywarp.warp");
+    public function __construct(string $dataFolder) {
+        parent::__construct("warp", "Teleport to a warp location");
+        $this->setPermission("easywarps.warp");
+        $this->dataFolder = $dataFolder;
     }
 
     public function execute(CommandSender $sender, string $label, array $args): bool {
         if ($sender instanceof Player) {
-            if (count($args) === 1) {
-                $warpName = strtolower($args[0]);
+            if (!$this->testPermission($sender)) {
+                $sender->sendMessage("You do not have permission to use this command.");
+                return true;
+            }
 
-                if ($this->warpExists($warpName)) {
-                    $warpLocation = $this->getWarpLocation($warpName);
+            if (empty($args)) {
+                $sender->sendMessage("Usage: /warp <warp>");
+                return false;
+            }
 
-                    if ($warpLocation !== null) {
-                        $warpPermission = "easywarp.warp.$warpName";
-                        $visibility = $warpLocation['visibility']; // Get the visibility from the warp data
+            $warpName = $args[0];
+            $warpLocation = $this->loadWarpData($warpName);
 
-                        // Check if the player has the appropriate permission based on visibility
-                        if ($visibility === "OP" && $sender->hasPermission($warpPermission)) {
-                            $this->teleportToWarp($sender, $warpLocation);
-                            $sender->sendMessage(TextFormat::GREEN . "Warped to '$warpName'!");
-                            return true;
-                        } elseif ($visibility === "TRUE") {
-                            $this->teleportToWarp($sender, $warpLocation);
-                            $sender->sendMessage(TextFormat::GREEN . "Warped to '$warpName'!");
-                            return true;
-                        } else {
-                            $sender->sendMessage(TextFormat::RED . "You do not have permission to warp to '$warpName'.");
-                        }
-                    }
+            if ($warpLocation !== null) {
+                $x = $warpLocation['x'];
+                $y = $warpLocation['y'];
+                $z = $warpLocation['z'];
+                $worldName = $warpLocation['world'];
+
+                $world = $sender->getServer()->getWorldManager()->getWorldByName($worldName);
+
+                if ($world !== null) {
+                    $warpVector = new Vector3($x, $y, $z);
+                    $sender->teleport($warpVector);
+                    $sender->sendMessage("Teleported to warp location '$warpName'.");
                 } else {
-                    $sender->sendMessage(TextFormat::RED . "Warp '$warpName' does not exist.");
+                    $sender->sendMessage("The world of the warp location no longer exists.");
                 }
             } else {
-                $sender->sendMessage(TextFormat::RED . "Usage: /warp <warpName>");
+                $sender->sendMessage("The warp location '$warpName' does not exist.");
             }
         } else {
-            $sender->sendMessage(TextFormat::RED . "You must be a player to use this command.");
+            $sender->sendMessage("This command can only be used in-game.");
         }
-
-        return false;
+        return true;
     }
 
-    private function warpExists(string $warpName): bool {
-        $config = new Config($this->plugin->getDataFolder() . "GlobalWarps.yml", Config::YAML);
+    private function loadWarpData(string $warpName): ?array {
+        $config = new Config($this->dataFolder . "warps.yml", Config::YAML);
+
         $warps = $config->get("warps", []);
-
-        return isset($warps[$warpName]);
-    }
-
-    private function getWarpLocation(string $warpName): ?array {
-        $config = new Config($this->plugin->getDataFolder() . "GlobalWarps.yml", Config::YAML);
-        $warps = $config->get("warps", []);
-
         return $warps[$warpName] ?? null;
-    }
-
-    private function teleportToWarp(Player $player, array $warpLocation): void {
-        $world = $warpLocation["world"];
-        $x = $warpLocation["x"];
-        $y = $warpLocation["y"];
-        $z = $warpLocation["z"];
-        $yaw = $warpLocation["yaw"];
-        $pitch = $warpLocation["pitch"];
-
-        $player->teleport($this->plugin->getServer()->getLevelByName($world)->getSpawnLocation()->setComponents($x, $y, $z), $yaw, $pitch);
     }
 }
