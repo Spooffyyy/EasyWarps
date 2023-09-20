@@ -27,22 +27,26 @@ class SetWarpCommand extends Command {
             if (count($args) === 1) {
                 $warpName = strtolower($args[0]);
 
-                if ($sender->hasPermission("easywarp.setwarp")) {
+                // Generate a permission node based on the warp name
+                $warpPermission = "easywarp.setwarp.$warpName";
+
+                if ($sender->hasPermission($warpPermission)) {
+                    $position = $sender->getPosition(); // Get the player's position.
+
                     $warpLocation = [
-                        "world" => $sender->getWorld()->getFolderName(),
-                        "x" => $sender->getX(),
-                        "y" => $sender->getY(),
-                        "z" => $sender->getZ(),
-                        "yaw" => $sender->getYaw(),
-                        "pitch" => $sender->getPitch(),
+                        'x' => $position->getX(),
+                        'y' => $position->getY(),
+                        'z' => $position->getZ(),
+                        'world' => $sender->getWorld()->getFolderName(),
+                        'permission' => $warpPermission,
                     ];
 
-                    $this->saveWarpData($warpName, $warpLocation);
+                    $this->saveGlobalWarpData($warpName, $warpLocation);
 
-                    $sender->sendMessage(TextFormat::GREEN . "Custom warp point '$warpName' set!");
+                    $sender->sendMessage(TextFormat::GREEN . "Global warp point '$warpName' set!");
                     return true;
                 } else {
-                    $sender->sendMessage(TextFormat::RED . "You do not have permission to set custom warps.");
+                    $sender->sendMessage(TextFormat::RED . "You do not have permission to set this warp.");
                 }
             } else {
                 $sender->sendMessage(TextFormat::RED . "Usage: /setwarp <warpName>");
@@ -53,8 +57,8 @@ class SetWarpCommand extends Command {
         return false;
     }
 
-    private function saveWarpData(string $warpName, array $warpLocation): void {
-        $config = new Config($this->plugin->getDataFolder() . "EasyWarps.yml", Config::YAML);
+    private function saveGlobalWarpData(string $warpName, array $warpLocation): void {
+        $config = new Config($this->plugin->getDataFolder() . "GlobalWarps.yml", Config::YAML);
 
         if (!$config->exists("warps")) {
             $config->set("warps", []);
@@ -63,14 +67,7 @@ class SetWarpCommand extends Command {
         $warps = $config->get("warps");
         $warps[$warpName] = $warpLocation;
 
-        if (!$config->exists("warplist")) {
-            $config->set("warplist", []);
-        }
-
-        $warplist = $config->get("warplist");
-        $warplist[] = $warpName;
-
-        $config->set("warplist", $warplist);
+        $config->set("warps", $warps);
         $config->save();
     }
 }
