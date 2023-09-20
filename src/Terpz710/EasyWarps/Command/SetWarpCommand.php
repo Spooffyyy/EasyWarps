@@ -29,7 +29,7 @@ class SetWarpCommand extends Command {
 
                 if ($sender->hasPermission("easywarp.setwarp")) {
                     $warpLocation = [
-                        "world" => $sender->getLevel()->getFolderName(),
+                        "world" => $sender->getWorld()->getFolderName(),
                         "x" => $sender->getX(),
                         "y" => $sender->getY(),
                         "z" => $sender->getZ(),
