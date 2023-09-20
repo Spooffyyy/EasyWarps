@@ -32,9 +32,14 @@ class WarpCommand extends Command {
 
                     if ($warpLocation !== null) {
                         $warpPermission = "easywarp.warp.$warpName";
+                        $visibility = $warpLocation['visibility']; // Get the visibility from the warp data
 
-                        // Check if the player is OP or has the appropriate permission
-                        if ($sender->isOp() || $sender->hasPermission($warpPermission)) {
+                        // Check if the player has the appropriate permission based on visibility
+                        if ($visibility === "OP" && $sender->hasPermission($warpPermission)) {
+                            $this->teleportToWarp($sender, $warpLocation);
+                            $sender->sendMessage(TextFormat::GREEN . "Warped to '$warpName'!");
+                            return true;
+                        } elseif ($visibility === "TRUE") {
                             $this->teleportToWarp($sender, $warpLocation);
                             $sender->sendMessage(TextFormat::GREEN . "Warped to '$warpName'!");
                             return true;
