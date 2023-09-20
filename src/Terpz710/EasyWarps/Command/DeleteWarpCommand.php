@@ -6,58 +6,59 @@ namespace Terpz710\EasyWarps\Command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\plugin\Plugin;
-use pocketmine\utils\TextFormat;
+use pocketmine\player\Player;
 use pocketmine\utils\Config;
 use Terpz710\EasyWarps\Main;
 
 class DeleteWarpCommand extends Command {
 
-    private $plugin;
+    private $dataFolder;
 
-    public function __construct(Plugin $plugin) {
-        parent::__construct("delwarp", "Delete a set warp", "/delwarp <warpName>");
-        $this->plugin = $plugin;
-        $this->setPermission("easywarp.deletewarp");
+    public function __construct(string $dataFolder) {
+        parent::__construct("deletewarp", "Delete a warp location");
+        $this->setPermission("easywarps.deletewarp");
+        $this->dataFolder = $dataFolder;
     }
 
     public function execute(CommandSender $sender, string $label, array $args): bool {
-        if (count($args) === 1) {
-            $warpName = strtolower($args[0]);
+        if ($sender instanceof Player) {
+            if (!$this->testPermission($sender)) {
+                $sender->sendMessage("You do not have permission to use this command.");
+                return true;
+            }
 
-            if ($this->warpExists($warpName)) {
-                if ($sender->hasPermission("easywarp.deletewarp")) {
-                    $this->deleteWarp($warpName);
-                    $sender->sendMessage(TextFormat::GREEN . "Warp '$warpName' deleted!");
-                    return true;
-                } else {
-                    $sender->sendMessage(TextFormat::RED . "You do not have permission to delete warp '$warpName'.");
-                }
+            if (empty($args)) {
+                $sender->sendMessage("Usage: /deletewarp <warp>");
+                return false;
+            }
+
+            $warpName = $args[0];
+            $warpData = $this->loadWarpData();
+
+            if (isset($warpData[$warpName])) {
+                unset($warpData[$warpName]);
+                $this->saveWarpData($warpData);
+
+                $sender->sendMessage("Warp location '$warpName' has been deleted.");
             } else {
-                $sender->sendMessage(TextFormat::RED . "Warp '$warpName' does not exist.");
+                $sender->sendMessage("The warp location '$warpName' does not exist.");
             }
         } else {
-            $sender->sendMessage(TextFormat::RED . "Usage: /delwarp <warpName>");
+            $sender->sendMessage("This command can only be used in-game.");
         }
-
-        return false;
+        return true;
     }
 
-    private function warpExists(string $warpName): bool {
-        $config = new Config($this->plugin->getDataFolder() . "EasyWarps.yml", Config::YAML);
-        $warps = $config->get("warps", []);
+    private function loadWarpData(): array {
+        $config = new Config($this->dataFolder . "warps.yml", Config::YAML);
 
-        return isset($warps[$warpName]);
+        return $config->get("warps", []);
     }
 
-    private function deleteWarp(string $warpName): void {
-        $config = new Config($this->plugin->getDataFolder() . "EasyWarps.yml", Config::YAML);
-        $warps = $config->get("warps", []);
+    private function saveWarpData(array $warpData): void {
+        $config = new Config($this->dataFolder . "warps.yml", Config::YAML);
 
-        if (isset($warps[$warpName])) {
-            unset($warps[$warpName]);
-            $config->set("warps", $warps);
-            $config->save();
-        }
+        $config->set("warps", $warpData);
+        $config->save();
     }
 }
