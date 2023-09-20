@@ -1,0 +1,15 @@
+name: EasyWarps
+version: 1.0.0
+author: Terpz710
+main: Terpz710\EasyWarps\Main
+api: 5.0.0
+
+permissions:
+  easywarp.warp:
+    description: Allows players to warp to specified locations.
+  easywarp.warps:
+    description: Allows players to list available warps.
+  easywarp.setwarp:
+    description: Allows players to set custom warp points.
+  easywarp.deletewarp:
+    description: Allows players to delete custom warp points.
