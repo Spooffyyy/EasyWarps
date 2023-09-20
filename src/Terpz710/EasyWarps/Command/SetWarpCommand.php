@@ -43,7 +43,7 @@ class SetWarpCommand extends Command {
                         'visibility' => $visibility,
                     ];
 
-                    $this->saveGlobalWarpData($warpName, $warpLocation, $visibility); // Pass $visibility as an argument
+                    $this->saveGlobalWarpData($warpName, $warpLocation, $warpPermission, $visibility); // Pass $warpPermission and $visibility as arguments
 
                     $sender->sendMessage(TextFormat::GREEN . "Global warp point '$warpName' set! Visibility: $visibility");
                     return true;
@@ -59,7 +59,7 @@ class SetWarpCommand extends Command {
         return false;
     }
 
-    private function saveGlobalWarpData(string $warpName, array $warpLocation, string $visibility): void { // Accept $visibility as an argument
+    private function saveGlobalWarpData(string $warpName, array $warpLocation, string $warpPermission, string $visibility): void { // Accept $warpPermission and $visibility as arguments
         $config = new Config($this->plugin->getDataFolder() . "GlobalWarps.yml", Config::YAML);
 
         if (!$config->exists("warps")) {
