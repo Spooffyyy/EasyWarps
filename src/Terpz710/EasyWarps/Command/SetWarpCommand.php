@@ -73,11 +73,11 @@ class SetWarpCommand extends Command {
 
         // Dynamically create the permission node based on visibility settings
         if ($visibility === "op") {
-            // Grant DEFAULT_OP permission to OP players
-            $this->plugin->getServer()->getPluginManager()->getPermissionManager()->addPermission($warpPermission, null, Permission::DEFAULT_OP);
+            // Create a permission node with "op"
+            $this->plugin->getServer()->getPluginManager()->addPermission($warpPermission, null, "op");
         } else {
-            // Grant DEFAULT_TRUE permission to non-OP players
-            $this->plugin->getServer()->getPluginManager()->getPermissionManager()->addPermission($warpPermission, null, Permission::DEFAULT_TRUE);
+            // Create a permission node with "true"
+            $this->plugin->getServer()->getPluginManager()->addPermission($warpPermission, null, "true");
         }
 
         $config->save();
