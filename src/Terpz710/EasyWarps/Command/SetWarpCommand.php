@@ -6,7 +6,6 @@ namespace Terpz710\EasyWarps\Command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat;
 use pocketmine\utils\Config;
@@ -23,7 +22,7 @@ class SetWarpCommand extends Command {
     }
 
     public function execute(CommandSender $sender, string $label, array $args): bool {
-        if ($sender instanceof Player) {
+        if ($sender instanceof CommandSender) {
             if (count($args) === 2) {
                 $warpName = strtolower($args[0]);
                 $visibility = strtolower($args[1]);
