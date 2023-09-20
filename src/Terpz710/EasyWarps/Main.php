@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Terpz710\EasyWarps;
 
 use pocketmine\plugin\PluginBase;
-use isTerpz710\EasyWarps\Command\SetWarpCommand;
-use isTerpz710\EasyWarps\Command\DeleteWarpCommand;
-use isTerpz710\EasyWarps\Command\WarpsCommand;
-use isTerpz710\EasyWarps\Command\WarpCommand;
+use Terpz710\EasyWarps\Command\SetWarpCommand;
+use Terpz710\EasyWarps\Command\DeleteWarpCommand;
+use Terpz710\EasyWarps\Command\WarpsCommand;
+use Terpz710\EasyWarps\Command\WarpCommand;
 
 class Main extends PluginBase {
 
