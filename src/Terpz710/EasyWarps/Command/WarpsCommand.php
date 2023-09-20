@@ -6,40 +6,44 @@ namespace Terpz710\EasyWarps\Command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\plugin\Plugin;
+use pocketmine\player\Player;
 use pocketmine\utils\Config;
-use pocketmine\utils\TextFormat;
 use Terpz710\EasyWarps\Main;
 
 class WarpsCommand extends Command {
 
-    private $plugin;
+    private $dataFolder;
 
-    public function __construct(Plugin $plugin) {
-        parent::__construct("warps", "List available warps", "/warps");
-        $this->plugin = $plugin;
-        $this->setPermission("easywarp.warps");
+    public function __construct(string $dataFolder) {
+        parent::__construct("warps", "List available warp locations");
+        $this->setPermission("easywarps.list");
+        $this->dataFolder = $dataFolder;
     }
 
     public function execute(CommandSender $sender, string $label, array $args): bool {
-        if ($sender instanceof CommandSender) {
-            $warps = $this->getWarpsList();
-
-            if (!empty($warps)) {
-                $sender->sendMessage(TextFormat::YELLOW . "Available warps:");
-                $sender->sendMessage(TextFormat::YELLOW . implode(", ", $warps));
-            } else {
-                $sender->sendMessage(TextFormat::RED . "No warps are available.");
+        if ($sender instanceof Player) {
+            if (!$this->testPermission($sender)) {
+                $sender->sendMessage("You do not have permission to use this command.");
+                return true;
             }
 
-            return true;
+            $warps = $this->loadWarpData();
+
+            if (empty($warps)) {
+                $sender->sendMessage("There are no available warp locations.");
+            } else {
+                $warpList = implode(", ", array_keys($warps));
+                $sender->sendMessage("Warps: " . $warpList);
+            }
+        } else {
+            $sender->sendMessage("This command can only be used in-game.");
         }
+        return true;
     }
 
-    private function getWarpsList(): array {
-        $config = new Config($this->plugin->getDataFolder() . "EasyWarps.yml", Config::YAML);
-        $warps = $config->get("warps", []);
+    private function loadWarpData(): array {
+        $config = new Config($this->dataFolder . "warps.yml", Config::YAML);
 
-        return array_keys($warps);
+        return $config->get("warps", []);
     }
 }
