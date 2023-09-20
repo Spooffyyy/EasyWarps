@@ -6,8 +6,8 @@ namespace Terpz710\EasyWarps\Command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\plugin\Plugin;
 use pocketmine\player\Player;
+use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat;
 use pocketmine\utils\Config;
 use Terpz710\EasyWarps\Main;
@@ -31,9 +31,16 @@ class WarpCommand extends Command {
                     $warpLocation = $this->getWarpLocation($warpName);
 
                     if ($warpLocation !== null) {
-                        $this->teleportToWarp($sender, $warpLocation);
-                        $sender->sendMessage(TextFormat::GREEN . "Warped to '$warpName'!");
-                        return true;
+                        $warpPermission = "easywarp.warp.$warpName";
+
+                        // Check if the player is OP or has the appropriate permission
+                        if ($sender->isOp() || $sender->hasPermission($warpPermission)) {
+                            $this->teleportToWarp($sender, $warpLocation);
+                            $sender->sendMessage(TextFormat::GREEN . "Warped to '$warpName'!");
+                            return true;
+                        } else {
+                            $sender->sendMessage(TextFormat::RED . "You do not have permission to warp to '$warpName'.");
+                        }
                     }
                 } else {
                     $sender->sendMessage(TextFormat::RED . "Warp '$warpName' does not exist.");
