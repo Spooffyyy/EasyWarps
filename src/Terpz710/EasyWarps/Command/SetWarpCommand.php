@@ -17,39 +17,45 @@ class SetWarpCommand extends Command {
     private $plugin;
 
     public function __construct(Plugin $plugin) {
-        parent::__construct("setwarp", "Set a warp point in your current world", "/setwarp <warpName>");
+        parent::__construct("setwarp", "Set a warp point in your current world", "/setwarp <warpName> <default: OP or TRUE>");
         $this->plugin = $plugin;
         $this->setPermission("easywarp.setwarp");
     }
 
     public function execute(CommandSender $sender, string $label, array $args): bool {
         if ($sender instanceof Player) {
-            if (count($args) === 1) {
+            if (count($args) === 2) {
                 $warpName = strtolower($args[0]);
+                $visibility = strtolower($args[1]);
 
-                // Generate a permission node based on the warp name
-                $warpPermission = "easywarp.setwarp.$warpName";
+                if ($visibility === "op" || $visibility === "true") {
+                    // Generate a permission node based on the warp name
+                    $warpPermission = "easywarp.setwarp.$warpName";
 
-                if ($sender->hasPermission($warpPermission)) {
-                    $position = $sender->getPosition(); // Get the player's position.
+                    if ($sender->hasPermission($warpPermission) || $sender->isOp()) {
+                        $position = $sender->getPosition(); // Get the player's position.
 
-                    $warpLocation = [
-                        'x' => $position->getX(),
-                        'y' => $position->getY(),
-                        'z' => $position->getZ(),
-                        'world' => $sender->getWorld()->getFolderName(),
-                        'permission' => $warpPermission,
-                    ];
+                        $warpLocation = [
+                            'x' => $position->getX(),
+                            'y' => $position->getY(),
+                            'z' => $position->getZ(),
+                            'world' => $sender->getWorld()->getFolderName(),
+                            'permission' => $warpPermission,
+                            'visibility' => $visibility,
+                        ];
 
-                    $this->saveGlobalWarpData($warpName, $warpLocation);
+                        $this->saveGlobalWarpData($warpName, $warpLocation);
 
-                    $sender->sendMessage(TextFormat::GREEN . "Global warp point '$warpName' set!");
-                    return true;
+                        $sender->sendMessage(TextFormat::GREEN . "Global warp point '$warpName' set! Visibility: $visibility");
+                        return true;
+                    } else {
+                        $sender->sendMessage(TextFormat::RED . "You do not have permission to set this warp.");
+                    }
                 } else {
-                    $sender->sendMessage(TextFormat::RED . "You do not have permission to set this warp.");
+                    $sender->sendMessage(TextFormat::RED . "Invalid visibility parameter. Use 'op' or 'true'.");
                 }
             } else {
-                $sender->sendMessage(TextFormat::RED . "Usage: /setwarp <warpName>");
+                $sender->sendMessage(TextFormat::RED . "Usage: /setwarp <warpName> <default: OP or TRUE>");
             }
         } else {
             $sender->sendMessage(TextFormat::RED . "You must be a player to use this command.");
