@@ -56,14 +56,14 @@ class WarpCommand extends Command {
     }
 
     private function warpExists(string $warpName): bool {
-        $config = new Config($this->plugin->getDataFolder() . "EasyWarps.yml", Config::YAML);
+        $config = new Config($this->plugin->getDataFolder() . "GlobalWarps.yml", Config::YAML);
         $warps = $config->get("warps", []);
 
         return isset($warps[$warpName]);
     }
 
     private function getWarpLocation(string $warpName): ?array {
-        $config = new Config($this->plugin->getDataFolder() . "EasyWarps.yml", Config::YAML);
+        $config = new Config($this->plugin->getDataFolder() . "GlobalWarps.yml", Config::YAML);
         $warps = $config->get("warps", []);
 
         return $warps[$warpName] ?? null;
@@ -77,6 +77,6 @@ class WarpCommand extends Command {
         $yaw = $warpLocation["yaw"];
         $pitch = $warpLocation["pitch"];
 
-        $player->teleport($this->plugin->getServer()->getLevelByName($world)->getSpawnLocation(), $yaw, $pitch);
+        $player->teleport($this->plugin->getServer()->getLevelByName($world)->getSpawnLocation()->setComponents($x, $y, $z), $yaw, $pitch);
     }
 }
