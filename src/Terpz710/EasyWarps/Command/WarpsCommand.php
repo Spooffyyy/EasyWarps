@@ -34,8 +34,6 @@ class WarpsCommand extends Command {
 
             return true;
         }
-
-        return false;
     }
 
     private function getWarpsList(): array {
