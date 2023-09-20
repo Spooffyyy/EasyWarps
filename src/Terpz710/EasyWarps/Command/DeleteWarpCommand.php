@@ -26,7 +26,7 @@ class DeleteWarpCommand extends Command {
             $warpName = strtolower($args[0]);
 
             if ($this->warpExists($warpName)) {
-                if ($sender->hasPermission("easywarp.deletewarp)) {
+                if ($sender->hasPermission("easywarp.deletewarp")) {
                     $this->deleteWarp($warpName);
                     $sender->sendMessage(TextFormat::GREEN . "Warp '$warpName' deleted!");
                     return true;
