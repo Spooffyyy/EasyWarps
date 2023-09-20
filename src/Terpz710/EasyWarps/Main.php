@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace isTerpz710\EasyWarps;
+namespace Terpz710\EasyWarps;
 
 use pocketmine\plugin\PluginBase;
 use isTerpz710\EasyWarps\Command\SetWarpCommand;
