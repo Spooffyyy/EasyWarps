@@ -30,7 +30,7 @@ class SetWarpCommand extends Command {
 
                 if ($visibility === "op" || $visibility === "true") {
                     // Generate a permission node based on the warp name
-                    $warpPermission = "easywarp.setwarp.$warpName";
+                    $warpPermission = "easywarp.warp.$warpName";
 
                     $position = $sender->getPosition(); // Get the player's position.
 
@@ -70,7 +70,16 @@ class SetWarpCommand extends Command {
         $warps[$warpName] = $warpLocation;
 
         $config->set("warps", $warps);
-        $config->set("permissions.$warpPermission", $visibility);
+
+        // Dynamically create the permission node based on visibility settings
+        if ($visibility === "op") {
+            // Grant DEFAULT_OP permission to OP players
+            $this->plugin->getServer()->getPluginManager()->getPermissionManager()->addPermission($warpPermission, null, Permission::DEFAULT_OP);
+        } else {
+            // Grant DEFAULT_TRUE permission to non-OP players
+            $this->plugin->getServer()->getPluginManager()->getPermissionManager()->addPermission($warpPermission, null, Permission::DEFAULT_TRUE);
+        }
+
         $config->save();
     }
 }
