@@ -45,7 +45,7 @@ class SetWarpCommand extends Command {
 
             $this->saveWarpData($warpName, $warpLocation);
 
-            $sender->sendMessage("Warp '§a$warpName§r' has been set!");
+            $sender->sendMessage("Warp§4 $warpName §rhas been set!");
         } else {
             $sender->sendMessage("This command can only be used in-game.");
         }
