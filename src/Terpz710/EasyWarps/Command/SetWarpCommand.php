@@ -16,8 +16,8 @@ class SetWarpCommand extends Command {
     private $dataFolder;
 
     public function __construct(string $dataFolder) {
-        parent::__construct("setwarp", "Set a warp location");
-        $this->setPermission("easywarps.setwarp");
+        parent::__construct("setwarp", "Set a warp");
+        $this->setPermission("easywarp.setwarp");
         $this->dataFolder = $dataFolder;
     }
 
@@ -29,23 +29,23 @@ class SetWarpCommand extends Command {
             }
 
             if (empty($args)) {
-                $sender->sendMessage("Usage: /setwarp <warp>");
+                $sender->sendMessage("Usage: /setwarp §a<warp>");
                 return false;
             }
 
             $warpName = $args[0];
-            $position = $sender->getPosition(); // Get the player's position.
+            $position = $sender->getPosition();
 
             $warpLocation = [
                 'x' => $position->getX(),
                 'y' => $position->getY(),
                 'z' => $position->getZ(),
-                'world' => $sender->getWorld()->getFolderName(), // Get the world's name.
+                'world' => $sender->getWorld()->getFolderName(),
             ];
 
             $this->saveWarpData($warpName, $warpLocation);
 
-            $sender->sendMessage("Warp location '$warpName' has been set!");
+            $sender->sendMessage("Warp '§a$warpName§r' has been set!");
         } else {
             $sender->sendMessage("This command can only be used in-game.");
         }
